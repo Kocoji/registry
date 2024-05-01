@@ -1,0 +1,14 @@
+redis:
+  enabled: false
+
+registry:
+  replicaCount: 1
+  username: admin
+  password: test1
+
+  maxUploadSize: 30m # maximum upload file
+  host: registry.kocoji.local
+  # garbageCron: 0 1 * * * # set the time to run docker image garbage collection, default is run daily at 00:00 AM
+
+
+fullnameOverride: "registry"

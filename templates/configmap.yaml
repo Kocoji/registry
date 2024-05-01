@@ -1,0 +1,49 @@
+{{- $fullName := include "registry.fullname" . -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-config
+data:
+  config.yaml: |
+    version: 0.1
+    log:
+      fields:
+        service: registry
+    storage:
+      cache:
+        {{- if .Values.redis.enabled }}
+        blobdescriptor: redis
+        {{- else }}
+        blobdescriptor: inmemory
+        {{- end}}
+      filesystem:
+        rootdirectory: /var/lib/registry
+    http:
+      addr: :5000
+      headers:
+        X-Content-Type-Options: [nosniff]
+    health:
+      storagedriver:
+        enabled: true
+        interval: 10s
+        threshold: 3
+    {{- if .Values.redis.enabled }}
+      tcp:
+      - addr: {{ $fullName }}-redis.{{ .Release.Namespace }}.svc:6379
+        timeout: 3s
+        interval: 10s
+        threshold: 3
+    redis:
+      addr: {{ $fullName }}-redis.{{ .Release.Namespace }}.svc:6379
+      dialtimeout: 10ms
+      readtimeout: 10ms
+      writetimeout: 10ms
+      pool:
+        maxidle: 16
+        maxactive: 64
+        idletimeout: 300s
+      tls:
+        enabled: false
+    {{- end}}
+
+    

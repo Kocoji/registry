@@ -1,0 +1,105 @@
+{{- $fullName := include "registry.fullname" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-server
+  labels:
+    app: {{ $fullName }}-server
+spec:
+  replicas: {{ .Values.registry.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ $fullName }}-server
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ $fullName }}-server
+    spec:
+      containers:
+        - name: {{ $fullName }}-server
+          image: registry:2
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REGISTRY_AUTH
+              value: htpasswd
+            - name: REGISTRY_AUTH_HTPASSWD_PATH
+              value: /auth/htpasswd
+            - name: REGISTRY_AUTH_HTPASSWD_REALM
+              value: Registry
+          volumeMounts:
+            - name: workdir
+              mountPath: /auth
+            - name: config 
+              mountPath: /etc/docker/registry/config.yml
+              subPath: config.yaml
+            - name: data
+              mountPath: /var/lib/registry
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: "2"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+      initContainers:
+        - name: init-password
+          image: httpd:2
+          command: [/bin/sh, -c]
+          args:
+            [htpasswd -Bbn {{.Values.registry.username}} {{.Values.registry.password}} > /auth/htpasswd || sleep 300]
+          volumeMounts:
+            - name: workdir
+              mountPath: /auth
+      volumes:
+        - name: config
+          configMap: 
+            name: {{ $fullName }}-config
+        - name: workdir
+          emptyDir: {}
+        - name: data
+          hostPath:
+            path: /tmp
+            type: Directory
+
+---
+{{- if .Values.redis.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-redis-server
+  labels:
+    app: {{ $fullName }}-redis
+spec:
+  replicas: {{ .Values.registry.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ $fullName }}-redis
+  template:
+    metadata:
+      labels:
+        app: {{ $fullName }}-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis/redis-stack-server:7.2.0-v10
+          ports:
+            - containerPort: 6379
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: "1"
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+{{- end }}
