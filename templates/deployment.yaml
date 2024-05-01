@@ -99,7 +99,7 @@ spec:
           livenessProbe:
             tcpSocket:
               port: 6379
-          readinessProbe:
+          -readinessProbe:
             tcpSocket:
               port: 6379
 {{- end }}
