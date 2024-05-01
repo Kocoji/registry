@@ -103,3 +103,5 @@ spec:
             tcpSocket:
               port: 6379
 {{- end }}
+
+{{ fullName }}
