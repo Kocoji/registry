@@ -20,5 +20,6 @@ spec:
   selector:
     app: {{ $fullName }}-redis
   ports:
+  -
   - port: 6379
     targetPort: 6379
