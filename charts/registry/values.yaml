@@ -3,11 +3,9 @@ redis:
 
 registry:
   replicaCount: 1
-  username: 
-  password: test1
+  # username: 
+  # password: 
 
   maxUploadSize: 30m # maximum upload file
   host: registry.local
-  # garbageCron: 0 1 * * * # set the time to run docker image garbage collection, default is run daily at 00:00 AM
-
-
+  garbageCron: 0 1 * * * # set the time to run docker image garbage collection, default is run daily at 00:00 AM
