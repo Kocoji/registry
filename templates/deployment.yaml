@@ -32,7 +32,7 @@ spec:
         volumeMounts:
           - name: workdir
             mountPath: /auth
-          - name: config 
+          - name: config
             mountPath: /etc/docker/registry/config.yml
             subPath: config.yaml
           - name: data
@@ -52,9 +52,20 @@ spec:
       initContainers:
       - name: init-password
         image: httpd:2
+        env: 
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ $fullName}}-basic-auth
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ $fullName}}-basic-auth
+              key: password
         command: [/bin/sh, -c]
         args:
-          [htpasswd -Bbn {{.Values.registry.username}} {{.Values.registry.password}} > /auth/htpasswd || sleep 300]
+          [htpasswd -Bbn $USERNAME $PASSWORD > /auth/htpasswd || sleep 300]
         volumeMounts:
           - name: workdir
             mountPath: /auth

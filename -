@@ -1,0 +1,199 @@
+---
+# Source: registry/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-config
+data:
+  config.yaml: |
+    version: 0.1
+    log:
+      fields:
+        service: registry
+    storage:
+      cache:
+        blobdescriptor: inmemory
+      filesystem:
+        rootdirectory: /var/lib/registry
+    http:
+      addr: :5000
+      headers:
+        X-Content-Type-Options: [nosniff]
+    health:
+      storagedriver:
+        enabled: true
+        interval: 10s
+        threshold: 3
+---
+# Source: registry/templates/services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-server
+spec:
+  selector:
+    app: registry-server
+  ports:
+  - port: 80
+    targetPort: 5000
+---
+# Source: registry/templates/services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-redis
+spec:
+  selector:
+    app: registry-redis
+  ports:
+  -
+  - port: 6379
+    targetPort: 6379
+---
+# Source: registry/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry-server
+  labels:
+    app: registry-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry-server
+  template:
+    metadata:
+      annotations:
+        checksum/config: 5ac65b04eebc7de20d32d792fc5b7582e1394be25bbdcb0fc4692724d277ed3d
+      labels:
+        app: registry-server
+    spec:
+      containers:
+        - name: registry-server
+          image: registry:2
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REGISTRY_AUTH
+              value: htpasswd
+            - name: REGISTRY_AUTH_HTPASSWD_PATH
+              value: /auth/htpasswd
+            - name: REGISTRY_AUTH_HTPASSWD_REALM
+              value: Registry
+          volumeMounts:
+            - name: workdir
+              mountPath: /auth
+            - name: config 
+              mountPath: /etc/docker/registry/config.yml
+              subPath: config.yaml
+            - name: data
+              mountPath: /var/lib/registry
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: "2"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+      initContainers:
+        - name: init-password
+          image: httpd:2
+          command: [/bin/sh, -c]
+          args:
+            [htpasswd -Bbn admin test1 > /auth/htpasswd || sleep 300]
+          volumeMounts:
+            - name: workdir
+              mountPath: /auth
+      volumes:
+        - name: config
+          configMap: 
+            name: registry-config
+        - name: workdir
+          emptyDir: {}
+        - name: data
+          hostPath:
+            path: /tmp
+            type: Directory
+---
+# Source: registry/templates/cronjob.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: myjob
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: registry-garbage-collect
+            image: registry:2
+            command:
+            - /bin/sh
+            - -c
+            - bin/registry garbage-collect /etc/docker/registry/config.yml
+            volumeMounts:
+            - name: config 
+              mountPath: /etc/docker/registry/config.yml
+              subPath: config.yaml
+            - name: data
+              mountPath: /var/lib/registry
+          restartPolicy: OnFailure
+          volumes:
+          - name: config
+            configMap: 
+              name: registry-config
+          - name: data
+            hostPath:
+              path: /tmp
+              type: Directory
+---
+# Source: registry/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: registry-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: '30m'
+  labels:
+    name: registry-ingress
+spec:
+  rules:
+  - host: "registry.kocoji.local"
+    http:
+      paths:
+      - path: "/"
+        pathType: Prefix
+        backend:
+          service:
+            name: registry-server
+            port: 
+              number: 80
+---
+# Source: registry/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "registry-test-connection"
+  labels:
+    helm.sh/chart: registry-0.1.0
+    app.kubernetes.io/name: registry
+    app.kubernetes.io/instance: render
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['registry:80']
+  restartPolicy: Never
