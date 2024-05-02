@@ -15,7 +15,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - bin/registry garbage-collect /etc/docker/registry/config.yml
+            - bin/registry garbage-collect /etc/docker/registry/config.yml || exit 0
             volumeMounts:
             - name: config 
               mountPath: /etc/docker/registry/config.yml
