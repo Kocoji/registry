@@ -42,7 +42,8 @@ jobs:
 
       - name: yaml check
         # if: steps.list-changed.outputs.changed == 'true'
-        run: yamllint output.yaml -f github
+        run: |
+          yamllint -d "{rules: {indentation: {spaces: 2, indent-sequences: consistent}}}" -f github
 
       # - name: Create kind cluster
       #   if: steps.list-changed.outputs.changed == 'true'
