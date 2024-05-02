@@ -38,10 +38,12 @@ jobs:
 
       - name: chart check
         # if: steps.list-changed.outputs.changed == 'true'
+        working-directory: ./charts/registry
         run: helm template render . > output.yaml && cat -n output.yaml # show chart value and line number.
 
       - name: yaml check
         # if: steps.list-changed.outputs.changed == 'true'
+        working-directory: ./charts/registry
         run: |
           yamllint -d "{rules: {indentation: {spaces: 2, indent-sequences: whatever}}}" output.yaml -f github
 
