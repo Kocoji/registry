@@ -39,8 +39,8 @@ spec:
             mountPath: /var/lib/registry
         resources:
           limits:
-            memory: 2Gi
-            cpu: "2"
+            memory: {{ .Values.registry.memoryLimit | default "512Mi" | quote }}
+            cpu: {{ .Values.registry.cpuLimit | default "0.5" | quote }}
         livenessProbe:
           httpGet:
             path: /
@@ -89,7 +89,7 @@ metadata:
   labels:
     app: {{ $fullName }}-redis
 spec:
-  replicas: {{ .Values.registry.replicaCount | default 1 }}
+  replicas: {{ .Values.redis.replicaCount | default 1 }}
   selector:
     matchLabels:
       app: {{ $fullName }}-redis
@@ -105,8 +105,8 @@ spec:
           - containerPort: 6379
         resources:
           limits:
-            memory: 2Gi
-            cpu: "1"
+            memory: {{ .Values.redis.memoryLimit | default "512Mi" | quote }}
+            cpu: {{ .Values.redis.cpuLimit | default "0.5" | quote }}
         livenessProbe:
           tcpSocket:
             port: 6379
