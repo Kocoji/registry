@@ -38,7 +38,7 @@ jobs:
 
       - name: chart check
         # if: steps.list-changed.outputs.changed == 'true'
-        run: helm template render . > output.yaml
+        run: helm template render . | tee output.yaml
 
       - name: yaml check
         # if: steps.list-changed.outputs.changed == 'true'
