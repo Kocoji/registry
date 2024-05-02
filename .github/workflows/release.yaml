@@ -38,7 +38,7 @@ jobs:
 
       - name: chart check
         # if: steps.list-changed.outputs.changed == 'true'
-        run: helm template render . | yamllint --
+        run: helm template render . | yamllint -
 
       # - name: Create kind cluster
       #   if: steps.list-changed.outputs.changed == 'true'
