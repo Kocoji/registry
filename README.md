@@ -53,3 +53,13 @@ Sử dụng lệnh helm install để cài dặt, vd:
 helm install --namespace {namespace_name} --create-namespace {service_name} registry 
 ```
 
+Hoặc tiện hơn, bạn có thể sử dụng:
+
+```sh
+helm repo add registry-server https://kocoji.github.io/registry
+```
+Sau đó cài đặt
+
+```sh
+helm install {service_name} registry-server/registry --namespace {namespace_name} --create-namespace --values {path/to/values.file}
+```
