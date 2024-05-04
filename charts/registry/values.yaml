@@ -1,15 +1,25 @@
-redis:
-  enabled: true
+redis: {}
+  # enabled: true
   # replicaCount: 1
   # memoryLimit: 2Gi
   # cpuLimit: "1"
 
-registry:
-  replicaCount: 1
+registry: 
+  # replicaCount: 1
   # username: 
   # password: 
-  maxUploadSize: 30m # maximum upload file
-  host: registry.local
+  # maxUploadSize: 30m # maximum upload file
+  # host: registry.local
   # garbageCron: "* * * * *" # set the time to run docker image garbage collection, default is run daily at 00:00 AM
   # memoryLimit: 2Gi
   # cpuLimit: "1"
+  tls: {}
+  #   enabled: true
+  #   secretName: ""
+  #   cert: |
+  #     -----BEGIN CERTIFICATE-----
+  #     -----END CERTIFICATE-----
+  #   key: | 
+  #     -----BEGIN PRIVATE KEY-----
+  #     -----END PRIVATE KEY-----
+

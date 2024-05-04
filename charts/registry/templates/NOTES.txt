@@ -1,0 +1,7 @@
+Congratulated! Your registry server is hosted at:
+http{{ if $.Values.registry.tls.enabled }}s{{ end }}://{{ $.Values.registry.host | default "registry.local" }}
+
+You have to update your Hosts/DNS to make it works.
+
+After that, you can now use: docker login {{ $.Values.registry.host | default "registry.local" }} 
+then push a new image to it. Cheers

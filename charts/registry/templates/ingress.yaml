@@ -10,10 +10,20 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}-ingress
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: {{.Values.registry.maxUploadSize | squote}}
+    nginx.ingress.kubernetes.io/proxy-body-size: {{.Values.registry.maxUploadSize | default "30m" | squote}}
   labels:
     name: {{ $fullName }}-ingress
 spec:
+  {{- if .Values.registry.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.registry.host  | default "registry.local" | quote }}
+    {{- if not .Values.registry.tls.secretName }}
+    secretName: {{ $fullName }}-tls
+    {{- else -}}
+    secretName: {{ .Values.registry.tls.secretName }}
+    {{ end -}}
+  {{- end }}
   rules:
   - host: {{ .Values.registry.host | default "registry.local" | quote }}
     http:
