@@ -10,7 +10,7 @@ spec:
       template:
         spec:
           containers:
-          - name: registry-garbage-collect
+          - name: {{ $fullName }}-garbage-collect
             image: registry:2
             command:
             - /bin/sh
