@@ -81,6 +81,7 @@ spec:
           type: Directory
 
 ---
+{{- if not .Values.redis.externalHost }}
 {{- if .Values.redis.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -113,4 +114,5 @@ spec:
         readinessProbe:
           tcpSocket:
             port: 6379
+{{- end }}
 {{- end }}

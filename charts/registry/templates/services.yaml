@@ -11,7 +11,8 @@ spec:
     targetPort: 5000
 
 ---
-
+{{- if not .Values.redis.externalHost }}
+{{- if .Values.redis.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -22,3 +23,5 @@ spec:
   ports:
   - port: 6379
     targetPort: 6379
+{{- end }}
+{{- end }}

@@ -1,5 +1,6 @@
-redis: {}
-  # enabled: true
+redis: 
+  enabled: true
+  # externalHost: "redis.local:6379" # Set to use the external redis instances. e.g. redis.local:6379 
   # replicaCount: 1
   # memoryLimit: 2Gi
   # cpuLimit: "1"

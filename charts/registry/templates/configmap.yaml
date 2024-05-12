@@ -29,12 +29,20 @@ data:
         threshold: 3
     {{- if .Values.redis.enabled }}
       tcp:
+      {{- if .Values.redis.externalHost }}
+      - addr: {{ .Values.redis.externalHost }}
+      {{- else }}
       - addr: {{ $fullName }}-redis.{{ .Release.Namespace }}.svc:6379
+      {{- end}}
         timeout: 3s
         interval: 10s
         threshold: 3
     redis:
+      {{- if .Values.redis.externalHost }}
+      addr: {{ .Values.redis.externalHost }}
+      {{- else }}
       addr: {{ $fullName }}-redis.{{ .Release.Namespace }}.svc:6379
+      {{- end}}
       dialtimeout: 10ms
       readtimeout: 10ms
       writetimeout: 10ms
