@@ -3,6 +3,16 @@ entries:
   registry:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2024-05-12T18:56:44.073556983Z"
+    description: A Helm chart for Kubernetes
+    digest: 51ae3a8d7caf8bc17b2235e6bd934002114c8e162712a1e87aaba57e17622574
+    name: registry
+    type: application
+    urls:
+    - https://github.com/Kocoji/registry/releases/download/registry-0.1.5/registry-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2024-05-04T19:53:23.670824468Z"
     description: A Helm chart for Kubernetes
     digest: c88d072e3d55d6a8e6939779a65273c15974b35c864fa2a2f3b6585c7f214435
@@ -31,4 +41,4 @@ entries:
     urls:
     - https://github.com/Kocoji/registry/releases/download/registry-0.1.2/registry-0.1.2.tgz
     version: 0.1.2
-generated: "2024-05-04T19:53:23.670839506Z"
+generated: "2024-05-12T18:56:44.073578684Z"
