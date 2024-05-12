@@ -16,7 +16,7 @@ Values được đặt với các cấu hình tùy chỉnh như sau.
 ```yaml
 redis:
   enabled: true
-  externalHost: "redis.local:6379"
+  externalHost: "" # Set to use the external redis instances. e.g. redis.local:6379 
   replicaCount: 1
   memoryLimit: 2Gi
   cpuLimit: "1"
