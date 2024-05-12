@@ -16,6 +16,7 @@ Values được đặt với các cấu hình tùy chỉnh như sau.
 ```yaml
 redis:
   enabled: true
+  externalHost: "" # Set to use the external redis instances. e.g. redis.local:6379 
   replicaCount: 1
   memoryLimit: 2Gi
   cpuLimit: "1"
@@ -40,7 +41,7 @@ registry:
       -----END PRIVATE KEY-----
 ```
 
-- Trong đó, cho phép bạn bật tắt tùy chọn Redis, nếu không sử dụng, service mặc định sử dụng `inmemory`
+- Trong đó, cho phép bạn bật tắt tùy chọn Redis, tùy chọn sử dụng `externalHost` nếu bạn muốn kết nối tới hệ thống redis hiện có. Nếu không sử dụng, service mặc định sử dụng `inmemory`
 - `username`/`password` sử dụng trong basic auth (mặc định sẽ là admin/admin nếu không được cấu hình). 
 - Set số lượng Rep qua key `replicaCount`. 
 - Cấu hình hostname sử dụng trong nginx Ingress và cấu hình maximum file có thể tải lên với key:`maxUploadSize`.
